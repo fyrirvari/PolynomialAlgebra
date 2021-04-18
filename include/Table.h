@@ -30,7 +30,8 @@ public:
 
 	// Modifiers
 	virtual T erase(iterator& pos) const = 0;
-	virtual void insert(conts K& key, const T& value) = 0;
+	virtual void insert(const Entry& entry) = 0;
+	virtual void insert(const K& key, const T& value) = 0;
 	virtual void merge(const Table& t) = 0;
 
 	// Lookup
