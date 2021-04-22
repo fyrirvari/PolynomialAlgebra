@@ -1,6 +1,7 @@
 #pragma once
 #include "Table.h"
 #include "List.h"
+#include <cmath>
 
 template<class K, class T>
 class HashTable : public Table<K, T>
@@ -9,7 +10,7 @@ class HashTable : public Table<K, T>
 	int _size;
 	int _c_size;
 
-	void init() const
+	void init()
 	{
 		_size = 0;
 		cells = new List<Entry<K, T>>[_c_size];
@@ -17,11 +18,15 @@ class HashTable : public Table<K, T>
 
 	int hash(const K& key) const
 	{
-		return reinterpret_cast<int>(key) % _c_size;
+		int sum = 0;
+		char* p = (char*)&key;
+		for (int i = 0; i < sizeof(K); ++i, ++p)
+			sum += (int)*p;
+		return abs(sum) % _c_size;
 	}
 public:
 	HashTable(int _c_size = 20) : _c_size(_c_size) {
-		if (_c_size)
+		if (_c_size < 0)
 			throw "Illegal argument for size";
 		init();
 	}
@@ -32,7 +37,7 @@ public:
 	}
 	~HashTable()
 	{
-		delete cells;
+		delete[] cells;
 	}
 	bool empty() const
 	{
@@ -51,15 +56,21 @@ public:
 		return _size;
 	}
 
-	T erase(const K& key)
+	T* erase(const K& key)
 	{
 		List<Entry<K, T>>& l = cells[hash(key)];
+		T* value = nullptr;
 		for (int i = 0; i < l.size(); i++)
 		{
 			if (l[i].key == key)
-				l.erase(i);
+			{
+				Entry<K, T>* entry = l.erase(i);
+				value = new T(entry->value);
+				delete entry;
+				--_size;
+			}
 		}
-		--_size;
+		return value;
 	}
 
 	void insert(const Entry<K, T>& entry)
