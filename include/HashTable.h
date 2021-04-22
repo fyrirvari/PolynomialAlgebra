@@ -13,7 +13,6 @@ class HashTable : public Table<K, T>
 	{
 		_size = 0;
 		cells = new List<Entry<K, T>>[_c_size];
-
 	}
 
 	int hash(const K& key) const
@@ -22,6 +21,8 @@ class HashTable : public Table<K, T>
 	}
 public:
 	HashTable(int _c_size = 20) : _c_size(_c_size) {
+		if (_c_size)
+			throw "Illegal argument for size";
 		init();
 	}
 	HashTable(const HashTable& ht) : _c_size(ht._c_size)
